@@ -23,3 +23,15 @@ build application ```gradlew build ```
 create docker image ```docker image build -t simplecurdappservice```
 
 Run container ```docker-compose up```
+
+##### Minkube deployment steps:
+
+	• kubectl apply -f \Deployments\secrets.yaml
+	
+	• kubectl apply -f \Deployments\deployment-mysql.yaml
+	 
+	• kubectl apply -f \Deployments\service-mysql.yaml
+	
+	• kubectl apply -f \Deployments\deployment-spring.yaml
+	
+	• kubectl apply -f \Deployments\service-spring.yaml
