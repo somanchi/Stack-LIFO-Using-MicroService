@@ -1,9 +1,25 @@
 # simplecurd
 
-simple spring boot application use Conditional bean to switch the database
+stack built with spring boot use Conditional bean to switch the database and performs push and pop operations
 
-To build application ```gradlew build ``` 
+### Steps to run containers
 
-To create docker image ```docker image build -t simplecurdappservice```
+##### Manual: 
+	• gradlew build
+	
+	• docker network create persistentStore
+	
+	• docker container run --name mysqldb --network persistentStore -e MYSQL_ROOT_PASSWORD=Somanchi@98 -e MYSQL_DATABASE=myschema -d mysql:8
+	
+	• docker image build -t simplecurdappservice .
 
-To run application on docker ```docker-compose up```
+	• docker container run --network persistentStore --name simplecurdapp -p 8080:8080 -d simplecurdapp
+
+##### Using docker compose
+Create docket newtork ```docker network create persistentStore```
+
+build application ```gradlew build ``` 
+
+create docker image ```docker image build -t simplecurdappservice```
+
+Run container ```docker-compose up```

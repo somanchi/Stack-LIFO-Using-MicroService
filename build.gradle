@@ -1,15 +1,44 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:2.1.1'
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.4.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'jacoco'
+	id "org.unbroken-dome.test-sets" version "2.1.1"
 }
+
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.unbroken-dome.test-sets'
 
 group = 'sp.sample'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
 repositories {
 	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', 'Greenwich.SR1')
 }
 
 dependencies {
@@ -31,8 +60,61 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
+	implementation 'junit:junit:4.12'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 test {
-	useJUnitPlatform()
+	afterTest { desc, result ->
+		println "Executing test [${desc.className}].${desc.name} with result: ${result.resultType}"
+	}
 }
+
+jacoco {
+	toolVersion = "0.8.4"
+	reportsDir = file("${project.buildDir}/jacocoHtml/")
+}
+
+jacocoTestReport {
+	dependsOn 'jacocoMerge'
+	group = "Reporting"
+	executionData(file("${project.buildDir}/jacoco/allTestCoverage.exec"))
+	reports {
+		xml.enabled true
+		csv.enabled false
+		html.enabled true
+		html.destination file("./build/jacocoHtml")
+	}
+}
+
+def allTestCoverageFile = "$buildDir/jacoco/allTestCoverage.exec"
+
+task jacocoMergeTest(type: JacocoMerge) {
+	destinationFile = file(allTestCoverageFile)
+	executionData = project.fileTree(dir: '.', include:'**/build/jacoco/*.exec')
+}
+
+task jacocoMerge(dependsOn: ['jacocoMergeTest']) {
+	// used to run the other merge tasks
+}
+
+jacocoTestCoverageVerification() {
+	//executionData = fileTree(buildDir).include("/jacoco/allTestCoverage.exec")
+
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.01
+			}
+		}
+	}
+}
+jacocoTestCoverageVerification.dependsOn jacocoMerge
+
+// to run coverage verification during the build (and fail when appropriate)
+check.dependsOn jacocoTestCoverageVerification

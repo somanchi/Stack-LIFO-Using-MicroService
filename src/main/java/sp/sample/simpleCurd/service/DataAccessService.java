@@ -11,7 +11,7 @@ import sp.sample.simpleCurd.repository.DataAccessCurdRepository;
 public class DataAccessService {
 
     @Autowired
-    private DataAccessCurdRepository dataAccessCurdRepository;
+    public DataAccessCurdRepository dataAccessCurdRepository;
 
 
     public String insertObject(DataObject dataObject) {

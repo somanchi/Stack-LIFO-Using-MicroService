@@ -5,16 +5,21 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - persistentStore
+      - simpleCurdAppNetwork
+    environment:
+      - DB_USERNAME=root
+      - DB_PASSWORD=Somanchi@98
+      - HOST_NAME=mysqldbstore
+      - DATABASE_NAME=myschema
     depends_on:
       - mysqldbstore
 
   mysqldbstore:
     image: mysql:8
     networks:
-      - persistentStore
+      - simpleCurdAppNetwork
     environment:
       - MYSQL_ROOT_PASSWORD=Somanchi@98
       - MYSQL_DATABASE=myschema
 networks:
-  persistentStore:
+  simpleCurdAppNetwork:
