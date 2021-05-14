@@ -1,4 +1,4 @@
-# simplecurd
+# Stack-LIFO-Using-MicroService
 
 stack built with spring boot use Conditional bean to switch the database and performs push and pop operations
 
